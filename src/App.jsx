@@ -34,24 +34,26 @@ function clamp(n, lo, hi) {
 
 // ----- Hand evaluation -----
 function bestTotal(ranks) {
+  // Count aces as 1 first, then promote one ace to 11 if it doesn't bust.
   let total = 0;
   let aces = 0;
+
   for (const r of ranks) {
     if (r === "A") {
       aces += 1;
-      total += 11;
+      total += 1; // ace as 1
     } else if (isTenValue(r)) {
       total += 10;
     } else {
       total += parseInt(r, 10);
     }
   }
-  while (total > 21 && aces > 0) {
-    total -= 10;
-    aces -= 1;
-  }
-  const aceCount = ranks.filter((r) => r === "A").length;
-  const isSoft = aceCount > 0 && total <= 21 && aceCount > aces;
+
+  // If we have at least one ace, we can add +10 (making one ace count as 11)
+  // as long as it doesn't bust.
+  const isSoft = aces > 0 && total + 10 <= 21;
+  if (isSoft) total += 10;
+
   return { total, isSoft };
 }
 
